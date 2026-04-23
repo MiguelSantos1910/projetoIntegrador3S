@@ -3,6 +3,7 @@ const TagsClp = {
     "modo" : {"ns" : 3, "type" : "Array[Int16]"},
     "umidade" : {"ns" : 3, "type" : "Real"},
     "temperatura" : {"ns" : 3, "type" : "Real"},
+    "luminosidade" : {"ns" : 3, "type" : "Real"},
     "totalVazao" : {"ns" : 3, "type" : "Int16"},
     "totalEnergia" : {"ns" : 3, "type" : "Int16"},
     "alarmes" : {"ns" : 3, "type" : "Boolean"}
