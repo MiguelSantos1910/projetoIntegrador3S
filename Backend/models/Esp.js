@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const EspSchema = new mongoose.Schema(
   {
     temperatura: {type: String},
-    umidade: {type: String}, 
+    umidade: {type: String},
+    luminosidade : {type: String},
     data: {type: Date},
     hora: {type: Date}
   }
