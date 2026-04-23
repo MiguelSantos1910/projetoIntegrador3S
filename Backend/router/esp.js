@@ -14,15 +14,16 @@ router.get('/ler-dados', async (req, res) =>{
 
 router.post('/upload-dados', async(req, res) =>{
     try{
-        const {temperatura, umidade, data, hora} = req.body;
+        const {temperatura, umidade, luminosidade, data, hora} = req.body;
         if(!temperatura | !umidade){
             return res.status(400).json({ error: "Campos obrigatórios ausentes!" })
         }
-        const dados = await Esp.create({ temperatura, umidade, data, hora });
+        const dados = await Esp.create({ temperatura, umidade, luminosidade, data, hora });
         res.status(201).json({
             message: "Dados obtidos com sucesso!",
             temperatura: dados.temperatura,
             umidade: dados.umidade,
+            luz: dados.luminosidade,
             data: dados.data,
             hora: dados.hora
         })
