@@ -13,22 +13,3 @@ email VARCHAR(50) NOT NULL UNIQUE,
 senha VARCHAR(100) NOT NULL,
 PRIMARY KEY (id)
 );
-
-DELIMITER$$
-CREATE PROCEDURE atualizar_dados_esp(
-    IN p_id INT
-    IN p_temperatura FLOAT, 
-    IN p_umidade FLOAT, 
-    IN p_luminosidade INT
-)
-BEGIN
-   UPDATE esp_dados
-    SET
-        temperatura = p_temperatura,
-        umidade = p_umidade,
-        luminosidade = p_luminosidade,
-        data_registro = NOW()
-    WHERE id = p_id;
-END $$
-
-DELIMITER ;
