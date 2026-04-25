@@ -4,80 +4,158 @@ const Usuario = require('../models/db');
 
 router.get('/usuarios-cadastrados', async (req, res) =>{
     try{
+
         const usuario = await Usuario.query(
             `SELECT *
-            FROM usuario_dados
-            ORDER BY data_registro DESC
-            LIMIT 100`
+             FROM usuario_dados
+             ORDER BY id DESC
+             LIMIT 100`
         );
+
         res.status(200).json(usuario.rows);
+
     }catch(err){
-        console.error("usuarios-cadastrados error:", err.message);
-        res.status(500).json({ error: err.message });
+
+        console.error(
+            "usuarios-cadastrados error:",
+            err.message
+        );
+
+        res.status(500).json({
+            error: err.message
+        });
     }
 });
 
 router.post('/cadastrar-usuario', async (req, res) =>{
     try{
+
         const {nome, email, senha} = req.body;
-        if (!nome | !email | !senha){
-            return res.status(400).json({error: "Campos obrigatórios ausentes."})
+
+        if (!nome || !email || !senha){
+
+            return res.status(400).json({
+                error: "Campos obrigatórios ausentes."
+            });
         }
-        const novoUsuario = await Usuario.query(
+
+        const novoUsuario =
+            await Usuario.query(
+
             `INSERT INTO usuario_dados
-            (nome, email, senha)
-            VALUES ($1, $2, $3)
-            RETURNING *`,
+             (nome, email, senha)
+             VALUES ($1, $2, $3)
+             RETURNING *`,
+
+            [nome, email, senha]
+
         );
-        res.status(201).json({message: "Usuário criado com sucesso!", novoUsuario});
+
+        res.status(201).json({
+            message: "Usuário criado com sucesso!",
+            usuario: novoUsuario.rows[0]
+        });
+
     }catch(err){
-        console.error("Não foi possível cadastrar o usuário.", err.message);
-        res.status(500).json({ error: err.message });
+
+        console.error(
+            "Não foi possível cadastrar o usuário.",
+            err.message
+        );
+
+        res.status(500).json({
+            error: err.message
+        });
     }
-})
+});
+
 
 router.put('/atualizar-cadastro/:id', async (req, res) =>{
     try{
-        
+
+        const { id } = req.params;
         const { nome, email, senha } = req.body;
-        const dadosAtualizado = {};
 
-        if(nome) dadosAtualizado.nome = nome;
-        if(email) dadosAtualizado.email = email;
-        if(senha) dadosAtualizado.senha = senha;
+        const usuarioAtualizado =
+            await Usuario.query(
 
-        const usuarioAtualizado = await Usuario.findByIdAndUpdate(
-            req.params.id,
-            dadosAtualizado,
-            { new: true}
-        )
-        if(!usuarioAtualizado){
-            return res.status(404).json({ message: "Usuário não encontrado."})
+            `UPDATE usuario_dados
+             SET nome = $1,
+                 email = $2,
+                 senha = $3
+             WHERE id = $4
+             RETURNING *`,
+
+            [nome, email, senha, id]
+
+        );
+
+        if (usuarioAtualizado.rows.length === 0){
+
+            return res.status(404).json({
+                message: "Usuário não encontrado."
+            });
+        }
+
+        res.status(200).json(
+            usuarioAtualizado.rows[0]
+        );
+
+    }catch(err){
+
+        console.error(
+            "Não foi possível atualizar o usuário.",
+            err.message
+        );
+
+        res.status(400).json({
+            error: err.message
+        });
+    }
+});
+
+router.delete("/deletar-usuario/:id",
+async (req, res) => {
+
+    try{
+
+        const { id } = req.params;
+
+        const usuarioDeletado =
+            await Usuario.query(
+
+            `DELETE FROM usuario_dados
+             WHERE id = $1
+             RETURNING *`,
+
+            [id]
+
+        );
+
+        if (usuarioDeletado.rows.length === 0){
+
+            return res.status(404).json({
+                message: "Usuário não encontrado!"
+            });
         }
 
         res.status(200).json({
-            id: usuarioAtualizado,
-            nome: usuarioAtualizado.nome,
-            email: usuarioAtualizado.email,
-            senha: usuarioAtualizado.senha
+            message:
+            "Usuário deletado com sucesso!"
         });
-    }catch(err){
-        console.error("Não foi possível atualizar o usuário.", err.message);
-        res.status(400).json({ error: err.message });
-    }
-})
 
-router.delete("/deletar-usuario/:id", async (req, res) => {
-    try {
-        const usuarioDeletado = await Usuario.findByIdAndDelete(req.params.id);
-        if (!usuarioDeletado) {
-            return res.status(404).json({ message: "Usuário não encontrado!" });
-        }
-        res.status(200).json({ message: "Usuário deletado com sucesso!" });
-    } catch (err) {
-        console.error("Erro ao deletar o usuário", err.message);
-        res.status(500).json({ error: err.message });
+    }catch (err){
+
+        console.error(
+            "Erro ao deletar o usuário",
+            err.message
+        );
+
+        res.status(500).json({
+            error: err.message
+        });
     }
+
 });
 
 module.exports = router;
