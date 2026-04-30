@@ -15,7 +15,7 @@ router.get('/ler-dados', async (req, res) =>{
         console.error("Não foi possível obter os dados da ESP.", err);
         res.status(500).json({error: err.message});
     }
-})
+});
 
 router.post('/upload-dados', async(req, res) =>{
     try{
@@ -37,6 +37,34 @@ router.post('/upload-dados', async(req, res) =>{
     }catch(err){
         console.error("Não foi possível fazer o upload dos dados da ESP.", err);
         res.status(500).json({error: err.message});
+    } 
+});
+
+router.post('/ativar-bomba', async(req, res) =>{
+    try {
+        const { ligarBomba } = req.body;
+        if(ligarBomba){
+            return res.status(201).json({
+                message: "Bomba ativada!"
+            });
+        }
+    } catch(err){
+        console.error("Não foi possível ativar a bomba no momento.", err);
+        res.status(500).json({error: err.message });
+    }
+});
+
+router.post('/desativar-bomba', async(req, res) =>{
+    try {
+        const { desligarBomba } = req.body;
+        if(desligarBomba){
+            return res.status(201).json({
+                message: "Bomba desligada!"
+            });
+        } 
+    } catch(err){
+        console.error("Não foi possível desligar a bomba no momento.", err);
+        res.status(500).json({error: err.message });
     }
 });
 module.exports = router;
