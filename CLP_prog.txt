@@ -1,0 +1,89 @@
+PROGRAM agroCLP
+VAR
+    sistema_on : BOOL;
+    bomba_irrigacao : BOOL;
+    bt_liga : BOOL;
+    bt_desliga : BOOL;
+    bt_emerg : BOOL;
+    bt_ligaBomba : BOOL;
+    sensor_temperatura : INT; //luminosidade, temperatura e umidade vão usar um pottenciômetro para simular o sensor.
+    sensor_umidade : INT;
+    sensor_luminosidade : INT;
+    temperatura : REAL;
+    umidade : REAL;
+    luminosidade : REAL;
+    setor_estado : INT;
+    status_sensor_temperatura : WSTRING;
+    status_sensor_umidade : WSTRING;
+    status_sensor_luminosidade : WSTRING;
+    status : WSTRING;
+    alarmes : WSTRING;
+    manual : BOOL;
+    automatico : BOOL;
+    lamp_on : BOOL;
+    lamp_emerg : BOOL;
+    lamp_falha : BOOL;
+    consumoEstimado : INT;
+    consumoFinal : INT;
+    consumoTxt : WSTRING;
+END_VAR
+
+//Entradas
+sensor_luminosidade := AI0;
+sensor_temperatura := AI1;
+sensor_umidade := AI2;
+bt_liga := I00;
+bt_desliga := I01;
+bt_emerg := I02;
+
+//Saídas
+Q00 := bomba_irrigacao;
+Q01 := lamp_emerg;
+Q02 := lamp_falha;
+Q03 := lamp_on;
+
+//Variáveis
+setor_estado := 0;
+sistema_on := 0;
+alarmes := ' ';
+status_sensor_temperatura := ' ';
+status_sensor_umidade := ' ';
+status_sensor_luminosidade := ' ';
+
+IF bt_liga THEN
+    sistema_on := TRUE;
+END_IF;
+
+IF bt_desliga THEN
+    sistema_on := FALSE;
+END_IF;
+
+IF manual = TRUE THEN
+
+    IF sistema_on THEN
+        lamp_on := TRUE;
+
+        temperatura := INT_TO_REAL(sensor_temperatura) * 100.0 / 27648.0;
+        umidade := INT_TO_REAL(sensor_umidade) * 100.0 / 27648.0;
+        luminosidade := INT_TO_REAL(sensor_luminosidade) * 1000.0 / 27648.0;
+
+        status_sensor_temperatura := CONCAT('Temp: ', REAL_TO_WSTRING(temperatura));
+        status_sensor_umidade := CONCAT('Umidade: ', REAL_TO_WSTRING(umidade));
+        status_sensor_luminosidade := CONCAT('Luz: ', REAL_TO_WSTRING(luminosidade));
+
+        IF temperatura >= 60.0 OR umidade < 20.0 THEN
+            status := 'Ligue a bomba!';
+        END_IF;
+
+        IF bt_ligaBomba THEN
+            bomba_irrigacao := TRUE;
+        ELSE
+            bomba_irrigacao := FALSE;
+        END_IF;
+
+    ELSE
+        lamp_on := FALSE;
+        bomba_irrigacao := FALSE;
+    END_IF;
+
+END_IF;
