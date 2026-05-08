@@ -20,7 +20,7 @@ router.get('/ler-dados', async (req, res) =>{
 router.post('/upload-dados', async(req, res) =>{
     try{
         const { temperatura, umidade, luminosidade } = req.body;
-        if(!temperatura | !umidade){
+        if(!temperatura || !umidade){
             return res.status(400).json({ error: "Campos obrigatórios ausentes!" })
         }
         const dados = await Banco.query(
