@@ -48,6 +48,7 @@ router.post('/ativar-bomba', async(req, res) =>{
                 message: "Bomba ativada!"
             });
         }
+        return res.status(400).json({ error: "Campo 'ligarBomba' ausente ou inválido!" });
     } catch(err){
         console.error("Não foi possível ativar a bomba no momento.", err);
         res.status(500).json({error: err.message });
@@ -61,7 +62,8 @@ router.post('/desativar-bomba', async(req, res) =>{
             return res.status(201).json({
                 message: "Bomba desligada!"
             });
-        } 
+        }
+       return res.status(400).json({ error: "Campo 'desligarBomba' ausente ou inválido!" });
     } catch(err){
         console.error("Não foi possível desligar a bomba no momento.", err);
         res.status(500).json({error: err.message });

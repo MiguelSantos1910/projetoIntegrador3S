@@ -69,6 +69,37 @@ router.post('/cadastrar-usuario', async (req, res) =>{
     }
 });
 
+router.post('/login', async (req, res) => {
+    try{
+        const { email, senha } = req.body;
+
+        const usuario = await Usuario.query(
+            `SELECT *
+             FROM usuario_dados
+             WHERE email = $1 AND senha = $2`,
+            [email, senha]
+        );
+        if (usuario.rows.length === 0){
+
+            return res.status(401).json({
+                message: "Credenciais inválidas."
+            });
+        }
+        res.status(200).json({
+            message: "Login bem-sucedido!",
+            usuario: usuario.rows[0]
+        });
+    }catch(err){
+
+        console.error(
+            "Erro ao realizar login.",
+            err.message
+        );
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
 
 router.put('/atualizar-cadastro/:id', async (req, res) =>{
     try{
